@@ -1,0 +1,33 @@
+{
+  "name": "syncData",
+  "version": "0.0.0",
+  "description": "client and server app testing on heroku",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.1.1",
+    "socket.io": "^0.9.16"
+  },
+  "engines": {
+    "node": "0.10.x"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/frankville/syncData.git"
+  },
+  "keywords": [
+    "nodejs",
+    "socket.io",
+    "IndexedDB"
+  ],
+  "author": "Villasanti Francisco",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/frankville/syncData/issues"
+  },
+  "homepage": "https://github.com/frankville/syncData"
+}
