@@ -5,11 +5,9 @@ var express = require('express'),
 
 
 console.log("antes del listen");
-app.listen(2011, function(){
-  console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
-});
+server.listen(2011);
 console.log("desp del listen");
-app.use('/',express.static(__dirname +'/syncDev/'));
+app.use('/',express.static(__dirname));
 app.get('/', function(request, response) {
 	console.log("entra aca");
   response.send(__dirname);
