@@ -16,12 +16,13 @@ app.get('/', function(request, response) {
 
 
 io.sockets.on('connection', function (socket) {
-	console.log("llega a onconnection?");
   socket.emit('news', { hello: 'world' });
   socket.on('my other event', function (data) {
     console.log(data);
   });
  	socket.on("addWT", function(data){
+      console.log("llega a addWT?");
+
  		console.log("New WorkingTime! "+JSON.stringify(data));
  		socket.emit("wtAdded", "WorkingTime added! ");
  	});	
