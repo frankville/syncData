@@ -4,8 +4,8 @@
   "description": "client and server app testing on heroku",
   "main": "server.js",
   "dependencies": {
-    "express": "^4.1.1",
-    "socket.io": "^0.9.16"
+    "express": "^4.x.x",
+    "socket.io": "^0.9.x"
   },
   "engines": {
     "node": "0.10.x"
