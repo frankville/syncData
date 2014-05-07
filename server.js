@@ -5,7 +5,7 @@ var express = require('express'),
 
 
 console.log("antes del listen");
-app.listen(process.env.PORT || 2011, function(){
+app.listen(2011, function(){
   console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
 });
 console.log("desp del listen");
