@@ -5,7 +5,7 @@ var express = require('express'),
 
 
 
-server.listen(2011);
+server.listen(80);
 
 app.use('/',express.static(__dirname +'/syncDev/'));
 app.get('/', function(request, response) {
