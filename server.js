@@ -5,7 +5,7 @@ var express = require('express'),
 
 
 console.log("antes del listen");
-server.listen(80);
+server.listen(2011);
 console.log("desp del listen");
 app.use('/',express.static(__dirname +'/syncDev/'));
 app.get('/', function(request, response) {
