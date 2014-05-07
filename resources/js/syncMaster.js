@@ -6,7 +6,7 @@
     socket.emit('my other event', { my: 'data' });
   });
   socket.on("wtAdded", function(data){
-    	console.log("message from server "+data);s
+    	console.log("message from server "+data);
   });
 });
   
