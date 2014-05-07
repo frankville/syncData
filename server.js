@@ -5,7 +5,9 @@ var express = require('express'),
 
 
 console.log("antes del listen");
-server.listen(80);
+app.listen(process.env.PORT || 2011, function(){
+  console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
+});
 console.log("desp del listen");
 app.use('/',express.static(__dirname +'/syncDev/'));
 app.get('/', function(request, response) {
