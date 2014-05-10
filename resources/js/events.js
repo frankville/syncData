@@ -39,7 +39,7 @@ wTime.openCursor().onsuccess = function(event) {
   if (cursor) {
 
   	var wt = new WorkingTime();
-  	wt.idwt = cursor.value.idwt;
+  	wt.cod = cursor.value.cod;
   	wt.employee = cursor.value.employee;
   	wt.captcheckin = cursor.value.captcheckin;
   	wt.checkin = cursor.value.checkin;
@@ -66,8 +66,8 @@ wTime.openCursor().onerror = function (event){
 
 var reloadwts = function(wts){
 	$("#lista tbody tr").remove();
-
-	// Check to see if we have any results.
+    console.log("entra a reload");
+	
 	if (!wts){
 	return;
 	}
@@ -83,7 +83,7 @@ var reloadwts = function(wts){
     	imgChout="<img src='"+imgCheckout+"' width='100' height='100' class='snapshot' >";
     }
     row = row +
-		"<td id='idwt'>"+wts[i].idwt+"</td>"+
+		"<td id='cod'>"+wts[i].cod+"</td>"+
 		"<td>"+wts[i].employee+"</td>"+
 		"<td>"+imgChin+"</td>"+
 		"<td>"+wts[i].checkin+"</td>"+
@@ -96,7 +96,7 @@ var reloadwts = function(wts){
 	};
 	$('#lista tbody tr :button').click(function(e){
 			console.log("valor closest "+$(this).closest('tr').html());
-		var id = $(this).closest('tr').find("#idwt").text();
+		var id = $(this).closest('tr').find("#cod").text();
 		$(this).closest('tr').remove();
 
  				deleteWT(id);

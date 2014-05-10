@@ -8,41 +8,40 @@ $( document ).ready( function(){
 
 
 var initDatabase = function () {
-var request = window.indexedDB.open('test-webcam', 1);
-request.onerror = function(event) {
-	showErrMsg("El navegador no soporta IndexedDB :/ "+JSON.stringify(event));
-};
-request.onsuccess = function(event) {
+    var request = window.indexedDB.open('test-webcam', 1);
+    request.onerror = function(event) {
+	console.log("El navegador no soporta IndexedDB :/ "+JSON.stringify(event));
+    };
+    request.onsuccess = function(event) {
 
 	database = request.result;
-  getWTItems();
-request.onerror = function ( event ){
-	showErrMsg("Database error! "+event.target.errorCode);
+	getWTItems();
+    };
 
-};
+    request.onerror = function ( event ){
+	console.log("Database error! "+event.target.errorCode);
+
+    };
 
 
-};
+    request.onupgradeneeded = function (event){
 
+	database  = event.target.result;
 
-request.onupgradeneeded = function (event){
+	var usuarios = database.createObjectStore("workingtime", { autoIncrement: true });
+	usuarios.createIndex("cod", "cod", { unique: false });  
+	usuarios.createIndex("employee", "employee", { unique: false });
+	usuarios.createIndex("captcheckin", "captcheckin", { unique: false });
+	usuarios.createIndex("checkin", "checkin", { unique: false });
+	usuarios.createIndex("captcheckout", "captcheckout", { unique: false });
+	usuarios.createIndex("checkout", "checkout", { unique: false });
 
-	  var db = event.target.result;
-
-  var usuarios = db.createObjectStore("workingtime", { autoIncrement: true });
-  usuarios.createIndex("idwt", "idwt", { unique: false });  
-  usuarios.createIndex("employee", "employee", { unique: false });
-  usuarios.createIndex("captcheckin", "captcheckin", { unique: false });
-  usuarios.createIndex("checkin", "checkin", { unique: false });
-  usuarios.createIndex("captcheckout", "captcheckout", { unique: false });
-  usuarios.createIndex("checkout", "checkout", { unique: false });
-
-};
+    };
 
 };
 
 function WorkingTime(){
-  this.idwt=1;
+  this.cod=1;
   this.employee = 0;
   this.captcheckin = new Blob();
   this.checkin = new Date();
@@ -64,7 +63,6 @@ function performCheckin(data,employee){
     transac.oncomplete = function (event) {
 
       console.log("Exito! WT agregado ");
-      socket.emit("addWT",checkin);
     };      
     transac.onerror = function(event){
       console.log("Error de IndexedDB al agregar un nuevo WT");
@@ -82,7 +80,7 @@ function performCheckin(data,employee){
 
 
 function updateWTID(key){
-    //get the object with that key
+    
     var transac  = database.transaction(["workingtime"],"readwrite");
     var wts = transac.objectStore("workingtime");
     var request = wts.get(key);
@@ -98,12 +96,12 @@ function updateWTID(key){
 
 
 function updateObjectID(wt, transaction,key){
-  wt.idwt = key;
+  wt.cod = key;
   var wts = transaction.objectStore("workingtime");
-  console.log("Valor del wt "+JSON.stringify(wt)+"  valor del key "+key);
+ 
   var request = wts.put(wt,key);
   request.onsuccess = function (event){
-
+      socket.emit("checkin",wt);
   }
   request.onerror = function(event){
     console.log("error en updateObjectID");
@@ -126,7 +124,7 @@ function performCheckout(capture, employee){
         if( (cursor.value.employee === employee) && (cursor.value.checkout == null)){
           console.log("entra al if de perfcheckout ");
           var wt = new WorkingTime();
-          wt.idwt = cursor.value.idwt;
+          wt.cod = cursor.value.cod;
           wt.employee = cursor.value.employee;
           wt.captcheckin = cursor.value.captcheckin;
           wt.checkin = cursor.value.checkin;
@@ -151,7 +149,7 @@ function updateObject(key,wt){
   var wts = transaction.objectStore("workingtime");
   var request = wts.put(wt,key);
   request.onsuccess = function(event){
-    console.log("se actualizo el objeto con key = "+key);
+      socket.emit("checkout",wt); 
   };
   request.onerror = function(event){
     console.log("error en updateObject :S");
@@ -170,11 +168,11 @@ function isACheckin(employee){
   var wts = transaction.objectStore("workingtime");
   wts.openCursor().onsuccess = function(event){
       var cursor = event.target.result;
-      console.log("entra al success de isACheckin");
+     
       if(cursor){
-        console.log("entra al cursor de isACheckin cursor employee = "+cursor.value.employee+"; param employee = "+employee+" checkout = "+typeof(cursor.value.checkout));
+     
         if( (cursor.value.employee === employee) && (cursor.value.checkout == null)){
-          console.log("entra en if isACheckin");
+         
             flag = false;
         }
         cursor.continue();
@@ -198,10 +196,63 @@ function isACheckin(employee){
 
   }
 
-}
+};
+
+function saveWT(wt){
+
+  var flag = true;
+  var transaction = database.transaction(["workingtime"],"readwrite");
+  var wts = transaction.objectStore("workingtime");
+    var req = wts.get(wt.cod.toString());
+    req.onsuccess = function(event){
+	flag = false;
+    };
+    req.onerror = function(event){
+	flag = true;
+    };
+    transaction.oncomplete = function(event){
+	if(flag){
+	    insertFromServer(wt,function(res){
+		console.log(res);
+	    });
+	}else{
+	    updateFromServer(wt,function(res){
+		console.log(res);
+	    });
+	};
+    };
+
+};
 
 
+function updateFromServer(wt,callback){
+    console.log("entra a updateFromServer cod "+wt.cod+" checkin "+wt.checkin);
+    var transaction = database.transaction(["workingtime"],"readwrite"), request = transaction.objectStore("workingtime").put(wt,wt.cod);
+    request.onerror = function(event){
+	console.log("entro en error");
+	callback("1");
+    };
+    request.onsuccess = function(event){
+	callback("0");
+	console.log("entro en success");
+    };
+    transaction.oncomplete = function(event){
+	getWTItems();
+    };
+};
 
-
-
-
+function insertFromServer(wt,callback){
+    console.log("entra a insertFromServer");
+    var transaction = database.transaction(["workingtime"],"readwrite"),request = transaction.objectStore("workingtime").add(wt);
+    request.onerror = function(event){
+	console.log("error insert");
+	callback("1");
+    };
+    request.onsuccess = function(event){
+	console.log("success insert");
+	callback("0");
+    };
+    transaction.oncomplete = function(event){
+	getWTItems();
+    };
+};
